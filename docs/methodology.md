@@ -1,0 +1,7 @@
+# Methodology
+
+This is a local disclosure-review draft. The reference is ORCA ωB97M-V/def2-TZVPD with OMol25 settings. Foundation models were evaluated zero-shot on molecular configurations spanning conformers, snapshots, clusters, binding, and reaction-related geometries. The benchmark uses five predeclared targets, including non-hydrogen force RMSE; the all-atom parity plot uses a different, explicitly labeled metric.
+
+The chosen model is UMA-S 1.2.1 with its pretrained OMol task head and element references retained. Full-model transfer learning used targeted ZDDP labels plus OMol25 replay; neutral replay examples were selected using the project element set, including a radical subset. Training used a learning rate of 1e-4, batch size 4, no weight decay, temperature sampling T=2, and 10 epochs. The saved configuration specifies a per-atom energy MAE loss with coefficient 30 and a force L2 norm loss with coefficient 5; these coefficients operate with the configuration's normalization, not as directly comparable raw physical-unit weights.
+
+The round-0 refit split contains 404 training, 90 validation and 157 test configurations. Singlet, triplet and thermal frames associated with a scan point are grouped, but no entire bond type is held out. Seven problematic labels were replaced after checking alternative electronic-state solutions before the refit. A separate general-domain set was used to assess forgetting.

@@ -1,0 +1,7 @@
+# Evaluation definitions and limits
+
+Force parity and statistics pool x, y and z force components over all atoms, in eV/Å. RMSE is the square root of the mean squared component error; MAE is the mean absolute component error; R² uses DFT components as the reference. Large structures have greater weight. This differs from the benchmark's original non-H target.
+
+For energy parity, total energy in eV is divided by atom count and converted to meV/atom. Within each chemical composition represented at least twice, the mean reference energy and the mean prediction are removed separately. This is equivalent to removing the mean prediction error per composition, computed from the test set; it evaluates within-composition relative energies and does not measure absolute-energy calibration or prediction on a new composition. The centered energy metric is pooled per structure. R² can be dominated by the span of the plotted energies and must be read alongside absolute errors.
+
+The script checks test IDs, disjoint train/test groups, atom ordering, coordinates and reference labels between models. The zero-shot benchmark and the fine-tuning test are distinct populations and should not be compared as if their aggregate errors were on the same data. The test has held-out groups but contains bond types present during training. Model-selection benchmark results are not a prospective independent evaluation. Some stretched structures remain inaccurate, general-domain forgetting remains, and DFT is itself an approximation.

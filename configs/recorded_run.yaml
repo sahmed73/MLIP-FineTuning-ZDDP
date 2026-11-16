@@ -1,0 +1,16 @@
+# Descriptive record for review; not an executable training configuration.
+model: UMA-S-1.2.1
+head: omol
+reference: ORCA wB97M-V/def2-TZVPD
+trainable_parameters: all
+learning_rate: 0.0001
+weight_decay: 0
+batch_size: 4
+epochs: 10
+sampling_temperature: 2
+loss:
+  energy: {type: per_atom_MAE, coefficient: 30}
+  forces: {type: L2_norm, coefficient: 5}
+  note: coefficients use the original model normalization
+project_split_structures: {train: 404, validation: 90, test: 157}
+split_note: scan-point groups kept together; bond types not held out
