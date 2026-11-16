@@ -1,7 +1,5 @@
 # MLIPs for ZDDP chemistry: benchmark, select, fine-tune
 
-> **PRIVATE REVIEW DRAFT — NOT CLEARED FOR PUBLIC RELEASE.** Figures, values, descriptions and code require disclosure review before publication.
-
 Machine-learned interatomic potentials can enable molecular simulations at a scale beyond routine electronic-structure calculations. But a general-purpose potential can fail on stretched bonds and unusual electronic states relevant to lubricant additives. This project benchmarks MACE, UMA and eSEN against consistent DFT references, selects a foundation model, and adapts it to targeted ZDDP chemistry.
 
 ![Foundation model force comparison](figures/foundation_force_parity.png)
@@ -30,7 +28,7 @@ The held-out force comparison measures how well the model reproduces local DFT f
 
 ## Reproduce and audit
 
-See [methodology](docs/methodology.md), [evaluation](docs/evaluation.md), and [reproducibility](docs/reproducibility.md). The plotting script reads project data locally; the private structures and model predictions are not included. Figure and text release requires explicit review.
+See [DFT dataset and calculation workflow](data/dft_round0/README.md), [methodology](docs/methodology.md), [evaluation](docs/evaluation.md), and [reproducibility](docs/reproducibility.md). Reference energies, forces and splits are included; model predictions are not.
 
 ![Validation loss](figures/validation_loss.png)
 *Validation loss as recorded during training; the horizontal axis counts validation evaluations, which occur more than once per epoch. Normalized logged loss is not a physical error metric. A comparable training-loss series has not yet been verified.*
