@@ -28,7 +28,7 @@ The held-out force comparison measures how well the model reproduces local DFT f
 
 ## Reproduce and audit
 
-See [DFT dataset and calculation workflow](data/dft_round0/README.md), [methodology](docs/methodology.md), [evaluation](docs/evaluation.md), and [reproducibility](docs/reproducibility.md). Reference energies, forces and splits are included; model predictions are not.
+See [DFT dataset and calculation workflow](data/dft_round0/README.md), [methodology](docs/methodology.md), [evaluation](docs/evaluation.md), and [reproducibility](docs/reproducibility.md). Reference energies, forces, splits and held-out model predictions are included. Run `python scripts/plot_results.py --out reproduced_figures` to recreate the figures.
 
 ![Validation loss](figures/validation_loss.png)
 *Validation loss as recorded during training; the horizontal axis counts validation evaluations, which occur more than once per epoch. Normalized logged loss is not a physical error metric. A comparable training-loss series has not yet been verified.*

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reproduce local review figures from private project outputs. Never uploads data."""
+"""Reproduce figures using released reference and prediction data."""
 import argparse, csv, json
 from collections import defaultdict
 from pathlib import Path
@@ -9,9 +9,8 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-p=argparse.ArgumentParser(); p.add_argument('--project',type=Path,required=True); p.add_argument('--out',type=Path,default=Path('figures')); a=p.parse_args()
-v=a.project/'computational_workflow/shared/mlip/validation/zeroshot_wb97mv_v01'
-f=a.project/'computational_workflow/shared/mlip/finetune_uma_s_round0_v01'
+p=argparse.ArgumentParser(); p.add_argument('--data',type=Path,default=Path('data')); p.add_argument('--out',type=Path,default=Path('figures')); a=p.parse_args()
+v=a.data/'predictions'; f=a.data/'dft_round0'
 a.out.mkdir(parents=True,exist_ok=True)
 plt.rcParams.update({'font.sans-serif':['Arial','DejaVu Sans'],'font.size':10,'axes.spines.top':False,'axes.spines.right':False,'pdf.fonttype':42,'figure.constrained_layout.use':True})
 colors=['#526171','#007e87','#d08b36']; labels=['MACE-OMOL-0','UMA-S','eSEN-sm']; names=['mace-omol-0','uma-s-1p2p1-omol','esen-sm-conserving-omol']
@@ -22,14 +21,14 @@ def metrics(x,y):
  d=y-x; den=np.sum((x-x.mean())**2)
  return np.sqrt(np.mean(d*d)),np.mean(abs(d)),1-np.sum(d*d)/den if den else float('nan')
 def parity(ax,x,y,title,color,unit):
- rm,ma,r2=metrics(x,y); ax.scatter(x,y,s=2,alpha=.20,color=color,rasterized=True); lo=min(x.min(),y.min()); hi=max(x.max(),y.max()); ax.plot([lo,hi],[lo,hi],color='black',lw=.8,ls='--'); ax.set(xlabel=f'DFT ({unit})',ylabel=f'MLIP ({unit})',title=title); ax.text(.04,.96,f'RMSE {rm:.3f}\nMAE {ma:.3f}\nR² {r2:.3f}',transform=ax.transAxes,va='top',bbox={'facecolor':'white','alpha':.8,'edgecolor':'none'}); return [float(rm),float(ma),float(r2)]
-points=np.load(v/'results/force_points.npz'); fig,axs=plt.subplots(1,3,figsize=(11,3.8)); scores={}
+ rm,ma,r2=metrics(x,y); ax.scatter(x,y,s=2,alpha=.20,color=color,rasterized=True); lo=min(x.min(),y.min()); hi=max(x.max(),y.max()); ax.plot([lo,hi],[lo,hi],color='black',lw=.8,ls='--'); ax.set(xlabel=f'DFT ({unit})',ylabel=f'MLIP ({unit})',title=title); ax.text(.04,.96,f'RMSE {rm:.3f}\nMAE {ma:.3f}\nR² {r2:.5f}',transform=ax.transAxes,va='top',bbox={'facecolor':'white','alpha':.8,'edgecolor':'none'}); return [float(rm),float(ma),float(r2)]
+points=np.load(v/'benchmark_force_components.npz'); fig,axs=plt.subplots(1,3,figsize=(11,3.8)); scores={}
 for ax,name,label,color in zip(axs,names,labels,colors): scores[label]=parity(ax,points[name+'__ref'],points[name+'__mlip'],label,color,'eV/Å')
 save(fig,'foundation_force_parity')
-with (f/'data/splits.csv').open() as fh: rows=list(csv.DictReader(fh))
+with (f/'splits.csv').open() as fh: rows=list(csv.DictReader(fh))
 test={r['calc_id'] for r in rows if r['split']=='test'}; train={r['group'] for r in rows if r['split']=='train'}; testgroups={r['group'] for r in rows if r['split']=='test'}
 assert not train & testgroups
-paths=[v/'predictions/uma-s-1p2p1-omol.extxyz',f/'predictions/ft_replay_lr1e-4.extxyz']; data=[]
+paths=[v/'uma-s-1p2p1-omol_test.extxyz',v/'uma-s-finetuned_test.extxyz']; data=[]
 for path in paths:
  found={}
  for at in iread(path,index=':'):
@@ -64,8 +63,7 @@ fig,axs=plt.subplots(1,2,figsize=(8,3.5))
 for y,label,color in zip(ys,['Pretrained','Fine-tuned'],[colors[0],colors[1]]): axs[0].hist(y-x,bins=np.linspace(-.3,.3,101),histtype='step',density=True,label=label,color=color)
 for (ref,pred),label,color in zip(energy,['Pretrained','Fine-tuned'],[colors[0],colors[1]]): axs[1].hist(pred-ref,bins=60,histtype='step',density=True,label=label,color=color)
 axs[0].set(xlabel='Force error (eV/Å)',ylabel='Density',title='Cartesian components'); axs[1].set(xlabel='Centered energy error (meV/atom)',ylabel='Density',title='Same-composition energies'); axs[0].legend(frameon=False); axs[1].legend(frameon=False); save(fig,'heldout_errors')
-log=(f/'logs/ft-uma-s-replay_lr1e-4-380897.out').read_text(errors='replace'); import re
-vals=[float(q) for q in re.findall(r'val/loss:\s*([0-9.]+)',log)]
+vals=json.loads((v/'validation_loss.json').read_text())
 if vals:
  fig,ax=plt.subplots(figsize=(5,3)); ax.plot(np.arange(1,len(vals)+1),vals,marker='o',color=colors[1]); ax.set(xlabel='Validation evaluation index',ylabel='Validation loss (logged units)'); save(fig,'validation_loss')
 (a.out/'metrics.json').write_text(json.dumps({'test_structures':len(test),'test_force_components':len(x),'foundation_force_parity_rmse_mae_r2':scores,'test_force_rmse_mae_r2':fs,'test_centered_energy_rmse_mae_r2':es,'energy_structures_used':len(energy[0][0]),'validation_points':len(vals)},indent=2)+'\n')

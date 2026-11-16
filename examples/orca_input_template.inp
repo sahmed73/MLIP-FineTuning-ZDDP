@@ -1,0 +1,14 @@
+# Illustrative template: supply the OMol25 custom def2-TZVPD basis via %basis
+# and replace charge, multiplicity and coordinates with a real configuration.
+# Spin handling and broken-symmetry starts must follow the dataset protocol.
+! wB97M-V EnGrad RIJCOSX def2/J NoUseSym DIIS NOSOSCF NormalConv DEFGRID3
+%scf
+  Convergence Tight
+  maxiter 300
+  THRESH 1e-12
+  TCUT 1e-13
+end
+# Add the appropriate custom basis definition and spin setup here.
+* xyz CHARGE MULTIPLICITY
+  # ELEMENT X Y Z (angstrom)
+*

@@ -1,0 +1,5 @@
+# Released predictions
+
+The four `*_test.extxyz` files contain the same 157 configurations from the round-0 test split and their DFT reference (`REF_energy`, `REF_forces`) and model predictions (`MLIP_energy`, `MLIP_forces`). Energies are total eV and force components are eV/Å. `calc_id` joins these files to the DFT dataset. MACE-OMOL-0, eSEN-sm conserving and pretrained UMA-S are zero-shot predictions; `uma-s-finetuned` is the round-0 UMA-S refit. The test structures were not used in the fine-tune, although some participated in the earlier model-selection benchmark. Thus the zero-shot comparison is not an independent prospective model-selection test.
+
+`benchmark_force_components.npz` stores flattened all-atom Cartesian-component reference and prediction arrays for the three foundation models on the separately defined scored benchmark; it does not include structure IDs or energies. It supports the foundation force parity figure, not per-structure analysis. `validation_loss.json` is the normalized logged validation loss per evaluation, not per epoch; no comparable training series was established.
