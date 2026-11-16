@@ -1,12 +1,42 @@
 # MLIPs for ZDDP chemistry: benchmark, select, fine-tune
 
-Machine-learned interatomic potentials can enable molecular simulations at a scale beyond routine electronic-structure calculations. But a general-purpose potential can fail on stretched bonds and unusual electronic states relevant to lubricant additives. This project benchmarks MACE, UMA and eSEN against consistent DFT references, selects a foundation model, and adapts it to targeted ZDDP chemistry.
+Machine-learned interatomic potentials (MLIPs) can enable molecular simulations at a scale beyond routine electronic-structure calculations. But a general-purpose potential can fail on stretched bonds and unusual electronic states relevant to lubricant additives. This project benchmarks MACE, UMA and eSEN against consistent density functional theory (DFT) references, selects a foundation model, and adapts it to zinc dialkyldithiophosphate (ZDDP) chemistry.
 
-![Foundation model force comparison](figures/foundation_force_parity.png)
-*Zero-shot comparison. Force parity includes all Cartesian components of all atoms in the scored benchmark structures. These data informed model selection; they are not an independent test of a fine-tuned model.*
+**Key result: fine-tuning UMA-S reduced held-out force RMSE by about 35% on 157 configurations.**
+
+| Held-out metric | Pretrained UMA-S | Fine-tuned UMA-S | Reduction |
+|---|---:|---:|---:|
+| All-atom force-component RMSE (eV/Å) | 0.0340 | 0.0222 | 35% |
+| Composition-centered energy RMSE (meV/atom) | 1.153 | 0.286 | 75% |
+
+Force metrics pool 35,163 Cartesian components. Energy metrics use 154 configurations with repeated compositions, removing a mean offset separately for each composition and model. The grouped test split holds out configurations associated with scan points; every bond type remains represented in training. See [metric definitions](docs/evaluation.md) and [machine-readable results](figures/metrics.json).
 
 ![Fine-tuning force parity](figures/heldout_force_parity.png)
 *Pretrained and fine-tuned UMA-S evaluated on identical held-out configurations. Metrics pool all Cartesian force components; structures contribute in proportion to their number of atoms.*
+
+## My research role and skills
+
+This portfolio presents my ongoing research on adapting foundation MLIPs to ZDDP chemistry. My work spans preparing and checking DFT reference data, comparing model families, fine-tuning UMA-S with replay, and evaluating accuracy, generalization and molecular-dynamics stability. The released materials document the data and evaluation workflow; the original foundation models and training frameworks are third-party tools.
+
+**Skills demonstrated:** Python, NumPy, ASE, ORCA/DFT, MACE, UMA/fairchem, eSEN, transfer learning, grouped dataset splitting, HPC/Slurm workflows and scientific visualization.
+
+## Research workflow
+
+```mermaid
+flowchart LR
+    A["Sample molecular structures<br/>and targeted bond stretches"] --> B["DFT labels<br/>energies, forces and quality checks"]
+    B --> C["Benchmark<br/>MACE · UMA · eSEN"]
+    C --> D["Select UMA-S<br/>using task-specific criteria"]
+    D --> E["Fine-tune with replay<br/>grouped train / validation / test"]
+    E --> F["Evaluate<br/>held-out accuracy, forgetting and stability"]
+```
+
+The release contains 651 project-specific DFT configurations and test predictions for all three foundation-model families plus the fine-tuned UMA-S model. Start with the [DFT dataset and production workflow](data/dft_round0/README.md), [example notebook](examples/inspect_dft.ipynb), or [standalone plotting instructions](docs/reproducibility.md).
+
+## Foundation-model comparison
+
+![Foundation model force comparison](figures/foundation_force_parity.png)
+*Zero-shot comparison. Force parity includes all Cartesian components of all atoms in the scored benchmark structures. These data informed model selection; they are not an independent test of a fine-tuned model.*
 
 ## Model selection
 
